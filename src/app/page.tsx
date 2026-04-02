@@ -1,12 +1,56 @@
 'use client';
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import Image from "next/image";
 
 export default function Home() {
+  const makeMockNumbers = () => {
+    const randInt = (min: number, max: number) =>
+      Math.floor(Math.random() * (max - min + 1)) + min;
+    const randFloat = (min: number, max: number, decimals = 1) => {
+      const n = Math.random() * (max - min) + min;
+      const p = 10 ** decimals;
+      return Math.round(n * p) / p;
+    };
+    const formatMillions = (millions: number) => `$${millions.toFixed(1)}M`;
+
+    const qualifiedBorrowerAppointments = randInt(40, 140);
+    const applicationRatePercent = randInt(12, 34);
+    const fundedVolumeInfluenced = formatMillions(randFloat(1.2, 9.8, 1));
+
+    const caseStudies = [
+      {
+        lenderName: "Crescent Home Lending",
+        fundedVolume: formatMillions(randFloat(3.0, 12.5, 1)),
+        fundedVolumeDays: randInt(45, 120),
+      },
+      {
+        lenderName: "Blue Ridge Mortgage",
+        qualifiedAppointments: randInt(18, 65),
+        qualifiedAppointmentsWeeks: randInt(4, 12),
+      },
+      {
+        lenderName: "Harbor Equity Partners",
+        efficiencyImprovementPercent: randInt(10, 38),
+      },
+    ] as const;
+
+    return {
+      qualifiedBorrowerAppointments,
+      applicationRatePercent,
+      fundedVolumeInfluenced,
+      caseStudies,
+    };
+  };
+
+  const [mockNumbers, setMockNumbers] = useState<ReturnType<typeof makeMockNumbers> | null>(null);
+
   useEffect(() => {
+    // Generate mock values only on the client to avoid hydration mismatches.
+    setMockNumbers(makeMockNumbers());
+
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
@@ -125,15 +169,21 @@ export default function Home() {
         <div className="relative z-[1] mx-auto w-full max-w-sb px-4 sm:px-6">
           <div className="grid grid-cols-1 gap-8 text-center min-[600px]:grid-cols-3 min-[600px]:gap-6 reveal">
             <div>
-              <div className="font-display text-[clamp(2rem,4vw,3rem)] font-semibold text-sb-accent">[X]+</div>
+              <div className="font-display text-[clamp(2rem,4vw,3rem)] font-semibold text-sb-accent">
+                {mockNumbers ? `${mockNumbers.qualifiedBorrowerAppointments}+` : "—"}
+              </div>
               <div className="mt-1 text-[0.85rem] font-medium text-sb-text-secondary">Qualified Borrower Appointments</div>
             </div>
             <div>
-              <div className="font-display text-[clamp(2rem,4vw,3rem)] font-semibold text-sb-accent">[X]%</div>
+              <div className="font-display text-[clamp(2rem,4vw,3rem)] font-semibold text-sb-accent">
+                {mockNumbers ? `${mockNumbers.applicationRatePercent}%` : "—"}
+              </div>
               <div className="mt-1 text-[0.85rem] font-medium text-sb-text-secondary">Application Rate</div>
             </div>
             <div>
-              <div className="font-display text-[clamp(2rem,4vw,3rem)] font-semibold text-sb-accent">[X]</div>
+              <div className="font-display text-[clamp(2rem,4vw,3rem)] font-semibold text-sb-accent">
+                {mockNumbers ? mockNumbers.fundedVolumeInfluenced : "—"}
+              </div>
               <div className="mt-1 text-[0.85rem] font-medium text-sb-text-secondary">Funded Volume Influenced</div>
             </div>
           </div>
@@ -614,34 +664,47 @@ export default function Home() {
           </div>
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
             <div className="rounded-2xl border border-sb-border bg-sb-card p-6 transition-[border-color,transform] duration-300 hover:-translate-y-0.5 hover:border-sb-border-strong sm:p-8 reveal">
-              <div className="mb-2 font-display text-xl font-semibold">[Lender Name]</div>
+              <div className="mb-2 font-display text-xl font-semibold">
+                {mockNumbers ? mockNumbers.caseStudies[0].lenderName : "—"}
+              </div>
               <div className="flex flex-wrap gap-5">
                 <div className="min-w-[100px] flex-1 rounded-[10px] border border-sb-border bg-[rgba(42,50,130,0.05)] p-4">
-                  <div className="mb-0.5 font-display text-[1.3rem] font-bold text-sb-accent">$[X]</div>
+                  <div className="mb-0.5 font-display text-[1.3rem] font-bold text-sb-accent">
+                    {mockNumbers ? mockNumbers.caseStudies[0].fundedVolume : "—"}
+                  </div>
                   <div className="text-[0.75rem] font-medium text-sb-text-muted">
-                    Funded volume influenced in [Y days]
+                    Funded volume influenced in {mockNumbers ? `${mockNumbers.caseStudies[0].fundedVolumeDays} days` : "—"}
                   </div>
                 </div>
               </div>
             </div>
 
             <div className="rounded-2xl border border-sb-border bg-sb-card p-6 transition-[border-color,transform] duration-300 hover:-translate-y-0.5 hover:border-sb-border-strong sm:p-8 reveal reveal-delay-1">
-              <div className="mb-2 font-display text-xl font-semibold">[Lender Name]</div>
+              <div className="mb-2 font-display text-xl font-semibold">
+                {mockNumbers ? mockNumbers.caseStudies[1].lenderName : "—"}
+              </div>
               <div className="flex flex-wrap gap-5">
                 <div className="min-w-[100px] flex-1 rounded-[10px] border border-sb-border bg-[rgba(42,50,130,0.05)] p-4">
-                  <div className="mb-0.5 font-display text-[1.3rem] font-bold text-sb-accent">[X]</div>
+                  <div className="mb-0.5 font-display text-[1.3rem] font-bold text-sb-accent">
+                    {mockNumbers ? mockNumbers.caseStudies[1].qualifiedAppointments : "—"}
+                  </div>
                   <div className="text-[0.75rem] font-medium text-sb-text-muted">
-                    Qualified borrower appointments in [Y weeks]
+                    Qualified borrower appointments in{" "}
+                    {mockNumbers ? `${mockNumbers.caseStudies[1].qualifiedAppointmentsWeeks} weeks` : "—"}
                   </div>
                 </div>
               </div>
             </div>
 
             <div className="rounded-2xl border border-sb-border bg-sb-card p-6 transition-[border-color,transform] duration-300 hover:-translate-y-0.5 hover:border-sb-border-strong sm:p-8 reveal reveal-delay-2">
-              <div className="mb-2 font-display text-xl font-semibold">[Lender Name]</div>
+              <div className="mb-2 font-display text-xl font-semibold">
+                {mockNumbers ? mockNumbers.caseStudies[2].lenderName : "—"}
+              </div>
               <div className="flex flex-wrap gap-5">
                 <div className="min-w-[100px] flex-1 rounded-[10px] border border-sb-border bg-[rgba(42,50,130,0.05)] p-4">
-                  <div className="mb-0.5 font-display text-[1.3rem] font-bold text-sb-accent">[X]%</div>
+                  <div className="mb-0.5 font-display text-[1.3rem] font-bold text-sb-accent">
+                    {mockNumbers ? `${mockNumbers.caseStudies[2].efficiencyImprovementPercent}%` : "—"}
+                  </div>
                   <div className="text-[0.75rem] font-medium text-sb-text-muted">
                     Improvement in application-to-close efficiency
                   </div>
