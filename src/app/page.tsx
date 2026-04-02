@@ -1,16 +1,38 @@
 'use client';
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo } from "react";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import Image from "next/image";
+import Link from "next/link";
 
 export default function Home() {
-  const makeMockNumbers = () => {
+  const makeMockNumbers = (seed: string) => {
+    // Deterministic mock numbers (SSR-safe + no hydration mismatch).
+    const hashString = (str: string) => {
+      let h = 2166136261; // FNV-1a
+      for (let i = 0; i < str.length; i++) {
+        h ^= str.charCodeAt(i);
+        h = Math.imul(h, 16777619);
+      }
+      return h >>> 0;
+    };
+
+    const mulberry32 = (a: number) => {
+      return () => {
+        let t = (a += 0x6d2b79f5);
+        t = Math.imul(t ^ (t >>> 15), t | 1);
+        t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+        return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+      };
+    };
+
+    const rnd = mulberry32(hashString(seed));
+
     const randInt = (min: number, max: number) =>
-      Math.floor(Math.random() * (max - min + 1)) + min;
+      Math.floor(rnd() * (max - min + 1)) + min;
     const randFloat = (min: number, max: number, decimals = 1) => {
-      const n = Math.random() * (max - min) + min;
+      const n = rnd() * (max - min) + min;
       const p = 10 ** decimals;
       return Math.round(n * p) / p;
     };
@@ -45,12 +67,9 @@ export default function Home() {
     };
   };
 
-  const [mockNumbers, setMockNumbers] = useState<ReturnType<typeof makeMockNumbers> | null>(null);
+  const mockNumbers = useMemo(() => makeMockNumbers("social-bloom:home:metrics"), []);
 
   useEffect(() => {
-    // Generate mock values only on the client to avoid hydration mismatches.
-    setMockNumbers(makeMockNumbers());
-
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
@@ -129,22 +148,25 @@ export default function Home() {
               officers spend more time closing and less time hunting for demand.
             </p>
             <div className="mx-auto flex w-full max-w-md flex-col gap-3 reveal reveal-delay-3 sm:max-w-none sm:flex-row sm:flex-wrap sm:justify-center sm:gap-4">
-              <a href="https://socialbloom.io/schedule" className="group inline-flex min-h-12 w-full cursor-pointer items-center justify-center gap-2 rounded-[10px] border-none bg-gradient-to-br from-sb-primary to-[#4a4ae0] px-6 py-3.5 text-base font-semibold text-white shadow-[0_4px_20px_rgba(95,95,255,0.2)] transition-all duration-300 [transition-timing-function:cubic-bezier(0.16,1,0.3,1)] hover:-translate-y-0.5 hover:from-[#7272ff] hover:to-sb-primary hover:shadow-[0_8px_32px_rgba(95,95,255,0.25)] sm:w-auto sm:px-8 sm:py-4 [&_svg]:transition-transform [&_svg]:duration-300 group-hover:[&_svg]:translate-x-1">
+              <Link
+                href="/schedule"
+                className="group inline-flex min-h-12 w-full cursor-pointer items-center justify-center rounded-lg gap-2 bg-sb-primary px-6 py-3.5 text-base font-semibold text-white shadow-none transition-[background,transform,box-shadow] duration-[250ms] hover:-translate-y-px hover:bg-sb-purple-mid hover:shadow-[0_8px_24px_rgba(95,95,255,0.2)] sm:w-auto sm:px-8 sm:py-4"
+              >
                 Book a Strategy Call
                 <svg
-                  width="18"
-                  height="18"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <path d="M5 12h14" />
-                  <path d="m12 5 7 7-7 7" />
-                </svg>
-              </a>
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M5 12h14" />
+                <path d="m12 5 7 7-7 7" />
+              </svg>
+              </Link>
               <a href="#how" className="inline-flex min-h-12 w-full cursor-pointer items-center justify-center gap-2 rounded-[10px] border border-sb-border-strong bg-transparent px-6 py-3.5 text-base font-medium text-sb-text-secondary transition-all duration-300 hover:border-sb-purple-mid hover:bg-sb-primary/5 hover:text-sb-text sm:w-auto sm:px-8 sm:py-4">
                 See How It Works
               </a>
@@ -170,19 +192,19 @@ export default function Home() {
           <div className="grid grid-cols-1 gap-8 text-center min-[600px]:grid-cols-3 min-[600px]:gap-6 reveal">
             <div>
               <div className="font-display text-[clamp(2rem,4vw,3rem)] font-semibold text-sb-accent">
-                {mockNumbers ? `${mockNumbers.qualifiedBorrowerAppointments}+` : "—"}
+                {mockNumbers.qualifiedBorrowerAppointments}+
               </div>
               <div className="mt-1 text-[0.85rem] font-medium text-sb-text-secondary">Qualified Borrower Appointments</div>
             </div>
             <div>
               <div className="font-display text-[clamp(2rem,4vw,3rem)] font-semibold text-sb-accent">
-                {mockNumbers ? `${mockNumbers.applicationRatePercent}%` : "—"}
+                {mockNumbers.applicationRatePercent}%
               </div>
               <div className="mt-1 text-[0.85rem] font-medium text-sb-text-secondary">Application Rate</div>
             </div>
             <div>
               <div className="font-display text-[clamp(2rem,4vw,3rem)] font-semibold text-sb-accent">
-                {mockNumbers ? mockNumbers.fundedVolumeInfluenced : "—"}
+                {mockNumbers.fundedVolumeInfluenced}
               </div>
               <div className="mt-1 text-[0.85rem] font-medium text-sb-text-secondary">Funded Volume Influenced</div>
             </div>
@@ -665,15 +687,15 @@ export default function Home() {
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
             <div className="rounded-2xl border border-sb-border bg-sb-card p-6 transition-[border-color,transform] duration-300 hover:-translate-y-0.5 hover:border-sb-border-strong sm:p-8 reveal">
               <div className="mb-2 font-display text-xl font-semibold">
-                {mockNumbers ? mockNumbers.caseStudies[0].lenderName : "—"}
+                {mockNumbers.caseStudies[0].lenderName}
               </div>
               <div className="flex flex-wrap gap-5">
                 <div className="min-w-[100px] flex-1 rounded-[10px] border border-sb-border bg-[rgba(42,50,130,0.05)] p-4">
                   <div className="mb-0.5 font-display text-[1.3rem] font-bold text-sb-accent">
-                    {mockNumbers ? mockNumbers.caseStudies[0].fundedVolume : "—"}
+                    {mockNumbers.caseStudies[0].fundedVolume}
                   </div>
                   <div className="text-[0.75rem] font-medium text-sb-text-muted">
-                    Funded volume influenced in {mockNumbers ? `${mockNumbers.caseStudies[0].fundedVolumeDays} days` : "—"}
+                    Funded volume influenced in {mockNumbers.caseStudies[0].fundedVolumeDays} days
                   </div>
                 </div>
               </div>
@@ -681,16 +703,16 @@ export default function Home() {
 
             <div className="rounded-2xl border border-sb-border bg-sb-card p-6 transition-[border-color,transform] duration-300 hover:-translate-y-0.5 hover:border-sb-border-strong sm:p-8 reveal reveal-delay-1">
               <div className="mb-2 font-display text-xl font-semibold">
-                {mockNumbers ? mockNumbers.caseStudies[1].lenderName : "—"}
+                {mockNumbers.caseStudies[1].lenderName}
               </div>
               <div className="flex flex-wrap gap-5">
                 <div className="min-w-[100px] flex-1 rounded-[10px] border border-sb-border bg-[rgba(42,50,130,0.05)] p-4">
                   <div className="mb-0.5 font-display text-[1.3rem] font-bold text-sb-accent">
-                    {mockNumbers ? mockNumbers.caseStudies[1].qualifiedAppointments : "—"}
+                    {mockNumbers.caseStudies[1].qualifiedAppointments}
                   </div>
                   <div className="text-[0.75rem] font-medium text-sb-text-muted">
                     Qualified borrower appointments in{" "}
-                    {mockNumbers ? `${mockNumbers.caseStudies[1].qualifiedAppointmentsWeeks} weeks` : "—"}
+                    {mockNumbers.caseStudies[1].qualifiedAppointmentsWeeks} weeks
                   </div>
                 </div>
               </div>
@@ -698,12 +720,12 @@ export default function Home() {
 
             <div className="rounded-2xl border border-sb-border bg-sb-card p-6 transition-[border-color,transform] duration-300 hover:-translate-y-0.5 hover:border-sb-border-strong sm:p-8 reveal reveal-delay-2">
               <div className="mb-2 font-display text-xl font-semibold">
-                {mockNumbers ? mockNumbers.caseStudies[2].lenderName : "—"}
+                {mockNumbers.caseStudies[2].lenderName}
               </div>
               <div className="flex flex-wrap gap-5">
                 <div className="min-w-[100px] flex-1 rounded-[10px] border border-sb-border bg-[rgba(42,50,130,0.05)] p-4">
                   <div className="mb-0.5 font-display text-[1.3rem] font-bold text-sb-accent">
-                    {mockNumbers ? `${mockNumbers.caseStudies[2].efficiencyImprovementPercent}%` : "—"}
+                    {mockNumbers.caseStudies[2].efficiencyImprovementPercent}%
                   </div>
                   <div className="text-[0.75rem] font-medium text-sb-text-muted">
                     Improvement in application-to-close efficiency
@@ -853,9 +875,9 @@ export default function Home() {
               stream of qualified conversations your team can turn into
               applications and closings.
             </p>
-            <a
-              href="https://socialbloom.io/schedule"
-              className="group inline-flex min-h-12 w-full max-w-sm cursor-pointer items-center justify-center gap-2 rounded-[10px] border-none bg-gradient-to-br from-sb-primary to-[#4a4ae0] px-6 py-3.5 text-base font-semibold text-white shadow-[0_4px_20px_rgba(95,95,255,0.2)] transition-all duration-300 [transition-timing-function:cubic-bezier(0.16,1,0.3,1)] hover:-translate-y-0.5 hover:from-[#7272ff] hover:to-sb-primary hover:shadow-[0_8px_32px_rgba(95,95,255,0.25)] sm:w-auto sm:max-w-none sm:px-8 sm:py-4 [&_svg]:transition-transform [&_svg]:duration-300 group-hover:[&_svg]:translate-x-1"
+            <Link
+              href="/schedule"
+              className="inline-flex min-h-12 w-full max-w-sm items-center justify-center rounded-lg bg-sb-primary px-6 py-3.5 text-base font-semibold text-white shadow-none transition-[background,transform,box-shadow] duration-[250ms] hover:-translate-y-px hover:bg-sb-purple-mid hover:shadow-[0_8px_24px_rgba(95,95,255,0.2)] sm:w-auto sm:max-w-none sm:px-8 sm:py-4"
             >
               Book a Strategy Call
               <svg
@@ -871,7 +893,7 @@ export default function Home() {
                 <path d="M5 12h14" />
                 <path d="m12 5 7 7-7 7" />
               </svg>
-            </a>
+            </Link>
           </div>
         </div>
       </div>
