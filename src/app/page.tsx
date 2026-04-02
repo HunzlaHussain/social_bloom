@@ -6,6 +6,24 @@ import { SiteFooter } from "@/components/SiteFooter";
 import Image from "next/image";
 import Link from "next/link";
 
+const RESULT_CARDS = [
+  {
+    title: "Northstar Capital",
+    value: "$7.4M",
+    subtext: "Funded volume influenced in 83 days",
+  },
+  {
+    title: "Summit Business Funding",
+    value: "19",
+    subtext: "Qualified business borrower appointments in 5 weeks",
+  },
+  {
+    title: "Ironclad Working Capital",
+    value: "18%",
+    subtext: "Improvement in application-to-funding efficiency",
+  },
+] as const;
+
 export default function Home() {
   const makeMockNumbers = (seed: string) => {
     // Deterministic mock numbers (SSR-safe + no hydration mismatch).
@@ -31,39 +49,11 @@ export default function Home() {
 
     const randInt = (min: number, max: number) =>
       Math.floor(rnd() * (max - min + 1)) + min;
-    const randFloat = (min: number, max: number, decimals = 1) => {
-      const n = rnd() * (max - min) + min;
-      const p = 10 ** decimals;
-      return Math.round(n * p) / p;
-    };
-    const formatMillions = (millions: number) => `$${millions.toFixed(1)}M`;
-
     const qualifiedBorrowerAppointments = randInt(40, 140);
-    const applicationRatePercent = randInt(12, 34);
-    const fundedVolumeInfluenced = formatMillions(randFloat(1.2, 9.8, 1));
-
-    const caseStudies = [
-      {
-        lenderName: "Crescent Home Lending",
-        fundedVolume: formatMillions(randFloat(3.0, 12.5, 1)),
-        fundedVolumeDays: randInt(45, 120),
-      },
-      {
-        lenderName: "Blue Ridge Mortgage",
-        qualifiedAppointments: randInt(18, 65),
-        qualifiedAppointmentsWeeks: randInt(4, 12),
-      },
-      {
-        lenderName: "Harbor Equity Partners",
-        efficiencyImprovementPercent: randInt(10, 38),
-      },
-    ] as const;
 
     return {
       qualifiedBorrowerAppointments,
-      applicationRatePercent,
-      fundedVolumeInfluenced,
-      caseStudies,
+      fundedVolumeInfluenced: "$22.5M",
     };
   };
 
@@ -171,17 +161,6 @@ export default function Home() {
                 See How It Works
               </a>
             </div>
-            <div className="mt-[72px] text-center [&_p]:mb-6 [&_p]:text-[0.8rem] [&_p]:font-medium [&_p]:uppercase [&_p]:tracking-[0.12em] [&_p]:text-sb-text-muted reveal reveal-delay-4">
-              <p>
-                Built for modern lending teams that need consistent borrower
-                demand
-              </p>
-              <div className="flex flex-wrap items-center justify-center gap-6 opacity-50 sm:gap-10 md:gap-12 [&_span]:font-display [&_span]:text-base [&_span]:font-semibold [&_span]:tracking-[0.02em] [&_span]:text-sb-text-secondary sm:[&_span]:text-lg md:[&_span]:text-[1.2rem]">
-                <span>Sequoia</span>
-                <span>Y Combinator</span>
-                <span>Techstars</span>
-              </div>
-            </div>
           </div>
         </div>
       </section>
@@ -189,18 +168,12 @@ export default function Home() {
       {/* METRICS */}
       <div className="border-y border-sb-border py-10">
         <div className="relative z-[1] mx-auto w-full max-w-sb px-4 sm:px-6">
-          <div className="grid grid-cols-1 gap-8 text-center min-[600px]:grid-cols-3 min-[600px]:gap-6 reveal">
+          <div className="grid grid-cols-1 gap-8 text-center min-[600px]:grid-cols-2 min-[600px]:gap-6 reveal">
             <div>
               <div className="font-display text-[clamp(2rem,4vw,3rem)] font-semibold text-sb-accent">
                 {mockNumbers.qualifiedBorrowerAppointments}+
               </div>
               <div className="mt-1 text-[0.85rem] font-medium text-sb-text-secondary">Qualified Borrower Appointments</div>
-            </div>
-            <div>
-              <div className="font-display text-[clamp(2rem,4vw,3rem)] font-semibold text-sb-accent">
-                {mockNumbers.applicationRatePercent}%
-              </div>
-              <div className="mt-1 text-[0.85rem] font-medium text-sb-text-secondary">Application Rate</div>
             </div>
             <div>
               <div className="font-display text-[clamp(2rem,4vw,3rem)] font-semibold text-sb-accent">
@@ -685,54 +658,22 @@ export default function Home() {
             </p>
           </div>
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-            <div className="rounded-2xl border border-sb-border bg-sb-card p-6 transition-[border-color,transform] duration-300 hover:-translate-y-0.5 hover:border-sb-border-strong sm:p-8 reveal">
-              <div className="mb-2 font-display text-xl font-semibold">
-                {mockNumbers.caseStudies[0].lenderName}
-              </div>
-              <div className="flex flex-wrap gap-5">
-                <div className="min-w-[100px] flex-1 rounded-[10px] border border-sb-border bg-[rgba(42,50,130,0.05)] p-4">
-                  <div className="mb-0.5 font-display text-[1.3rem] font-bold text-sb-accent">
-                    {mockNumbers.caseStudies[0].fundedVolume}
-                  </div>
-                  <div className="text-[0.75rem] font-medium text-sb-text-muted">
-                    Funded volume influenced in {mockNumbers.caseStudies[0].fundedVolumeDays} days
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="rounded-2xl border border-sb-border bg-sb-card p-6 transition-[border-color,transform] duration-300 hover:-translate-y-0.5 hover:border-sb-border-strong sm:p-8 reveal reveal-delay-1">
-              <div className="mb-2 font-display text-xl font-semibold">
-                {mockNumbers.caseStudies[1].lenderName}
-              </div>
-              <div className="flex flex-wrap gap-5">
-                <div className="min-w-[100px] flex-1 rounded-[10px] border border-sb-border bg-[rgba(42,50,130,0.05)] p-4">
-                  <div className="mb-0.5 font-display text-[1.3rem] font-bold text-sb-accent">
-                    {mockNumbers.caseStudies[1].qualifiedAppointments}
-                  </div>
-                  <div className="text-[0.75rem] font-medium text-sb-text-muted">
-                    Qualified borrower appointments in{" "}
-                    {mockNumbers.caseStudies[1].qualifiedAppointmentsWeeks} weeks
+            {RESULT_CARDS.map((card, i) => (
+              <div
+                key={card.title}
+                className={`rounded-2xl border border-sb-border bg-sb-card p-6 transition-[border-color,transform] duration-300 hover:-translate-y-0.5 hover:border-sb-border-strong sm:p-8 reveal${i === 1 ? " reveal-delay-1" : i === 2 ? " reveal-delay-2" : ""}`}
+              >
+                <div className="mb-2 font-display text-xl font-semibold">{card.title}</div>
+                <div className="flex flex-wrap gap-5">
+                  <div className="min-w-[100px] flex-1 rounded-[10px] border border-sb-border bg-[rgba(42,50,130,0.05)] p-4">
+                    <div className="mb-0.5 font-display text-[1.3rem] font-bold text-sb-accent">
+                      {card.value}
+                    </div>
+                    <div className="text-[0.75rem] font-medium text-sb-text-muted">{card.subtext}</div>
                   </div>
                 </div>
               </div>
-            </div>
-
-            <div className="rounded-2xl border border-sb-border bg-sb-card p-6 transition-[border-color,transform] duration-300 hover:-translate-y-0.5 hover:border-sb-border-strong sm:p-8 reveal reveal-delay-2">
-              <div className="mb-2 font-display text-xl font-semibold">
-                {mockNumbers.caseStudies[2].lenderName}
-              </div>
-              <div className="flex flex-wrap gap-5">
-                <div className="min-w-[100px] flex-1 rounded-[10px] border border-sb-border bg-[rgba(42,50,130,0.05)] p-4">
-                  <div className="mb-0.5 font-display text-[1.3rem] font-bold text-sb-accent">
-                    {mockNumbers.caseStudies[2].efficiencyImprovementPercent}%
-                  </div>
-                  <div className="text-[0.75rem] font-medium text-sb-text-muted">
-                    Improvement in application-to-close efficiency
-                  </div>
-                </div>
-              </div>
-            </div>
+            ))}
           </div>
         </div>
       </section>
