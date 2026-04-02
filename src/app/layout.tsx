@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Figtree } from "next/font/google";
 import "./globals.css";
 
@@ -8,16 +8,21 @@ const figtree = Figtree({
   display: "swap",
 });
 
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
+};
+
 export const metadata: Metadata = {
-  title:
-    "Social Bloom | $250M Growth Engine — Guaranteed Sales-Qualified Leads",
+  title: "Social Bloom for Lenders | More Qualified Borrower Appointments",
   description:
-    "Social Bloom delivers guaranteed sales-qualified leads booked directly on your calendar. 100% Done-For-You outbound engine. Pay only $250 per SQL.",
+    "Social Bloom helps lending companies generate qualified borrower appointments for purchase, refinance, and home equity offers without adding more headcount.",
   metadataBase: new URL("https://socialbloom.io"),
   openGraph: {
-    title: "Social Bloom | Stop Searching For Leads. Start Closing Them.",
+    title: "Social Bloom for Lenders | More Qualified Borrower Appointments",
     description:
-      "We deliver guaranteed sales-qualified leads booked directly on your sales calendar. 100% Done-For-You.",
+      "Social Bloom helps lending companies generate qualified borrower appointments for purchase, refinance, and home equity offers without adding more headcount.",
     type: "website",
     url: "https://socialbloom.io",
   },
@@ -39,7 +44,7 @@ export default function RootLayout({
   return (
     <html lang="en" className="h-full antialiased">
       <body
-        className={`${figtree.variable} min-h-full flex flex-col font-sans`}
+        className={`${figtree.variable} font-body flex min-h-dvh flex-col overflow-x-hidden bg-sb-bg text-sb-text`}
       >
         {children}
       </body>

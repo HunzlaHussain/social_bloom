@@ -1,26 +1,126 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@theme {
+  --font-display: var(--font-figtree), ui-sans-serif, system-ui, sans-serif;
+  --font-body: var(--font-figtree), ui-sans-serif, system-ui, sans-serif;
+
+  --color-sb-primary: #5f5fff;
+  --color-sb-secondary: #2a3282;
+  --color-sb-tertiary: #9fa6ff;
+  --color-sb-accent: #10b99a;
+  --color-sb-bg: #fafbfe;
+  --color-sb-bg-secondary: #f0f2f8;
+  --color-sb-text: #0d1b2a;
+  --color-sb-text-secondary: rgb(13 27 42 / 0.55);
+  --color-sb-text-muted: rgb(13 27 42 / 0.35);
+  --color-sb-border: rgb(42 50 130 / 0.1);
+  --color-sb-border-strong: rgb(42 50 130 / 0.2);
+  --color-sb-purple-mid: #7272ff;
+  --color-sb-card: rgb(42 50 130 / 0.04);
+  --color-sb-card-hover: rgb(42 50 130 / 0.07);
+  --color-sb-purple-glow: rgb(95 95 255 / 0.1);
+
+  --max-width-sb: 1200px;
+  --max-width-embed: 1100px;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@keyframes slowSpin {
+  from {
+    transform: translate(-50%, -50%) rotate(0deg);
+  }
+  to {
+    transform: translate(-50%, -50%) rotate(360deg);
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@keyframes gradientShift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 4.75rem;
+  }
+
+  @media (min-width: 768px) {
+    html {
+      scroll-padding-top: 5rem;
+    }
+  }
+
+  body {
+    font-family: var(--font-body);
+    @apply bg-sb-bg text-sb-text text-base font-normal leading-[1.65] antialiased overflow-x-hidden sm:text-lg;
+  }
+
+  section {
+    @apply py-12 sm:py-16 md:py-20 lg:py-24 xl:py-[100px];
+  }
+}
+
+/* Noise texture overlay (fixed pseudo-element) */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  pointer-events: none;
+  opacity: 0.015;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* Scroll-reveal (IntersectionObserver toggles .visible) */
+.reveal {
+  opacity: 0;
+  transform: translateY(32px);
+  transition:
+    opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.reveal-delay-1 {
+  transition-delay: 0.1s;
+}
+
+.reveal-delay-2 {
+  transition-delay: 0.2s;
+}
+
+.reveal-delay-3 {
+  transition-delay: 0.3s;
+}
+
+.reveal-delay-4 {
+  transition-delay: 0.4s;
+}
+
+/* FAQ accordion (click handler toggles .open on the FAQ row) */
+.faq-answer {
+  max-height: 0;
+  overflow: hidden;
+  transition:
+    max-height 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+    padding 0.4s;
+}
+
+.open .faq-answer {
+  max-height: min(90vh, 2400px);
+}
+
+.open button svg {
+  transform: rotate(180deg);
 }
