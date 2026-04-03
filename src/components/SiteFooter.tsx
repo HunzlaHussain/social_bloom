@@ -64,22 +64,7 @@ export function SiteFooter() {
                 Get Started
               </Link>
             </li>
-            <li>
-              <Link
-                href="/privacy"
-                className="text-sm text-sb-text-muted transition-colors hover:text-sb-text"
-              >
-                Privacy Policy
-              </Link>
-            </li>
-            <li>
-              <Link
-                href="/terms-of-service"
-                className="text-sm text-sb-text-muted transition-colors hover:text-sb-text"
-              >
-                Terms
-              </Link>
-            </li>
+            
           </ul>
         </div>
         <div className="mt-8 border-t border-sb-border pt-6 text-center text-[0.8rem] text-sb-text-muted">
