@@ -661,7 +661,9 @@ export default function Home() {
             {RESULT_CARDS.map((card, i) => (
               <div
                 key={card.title}
-                className={`rounded-2xl border border-sb-border bg-sb-card p-6 transition-[border-color,transform] duration-300 hover:-translate-y-0.5 hover:border-sb-border-strong sm:p-8 reveal${i === 1 ? " reveal-delay-1" : i === 2 ? " reveal-delay-2" : ""}`}
+                className={`rounded-2xl border border-sb-border bg-sb-card p-6 transition-[border-color,transform] duration-300 hover:-translate-y-0.5 hover:border-sb-border-strong sm:p-8 reveal${
+                  i === 1 ? " reveal-delay-1" : i === 2 ? " reveal-delay-2" : ""
+                }${i === RESULT_CARDS.length - 1 && RESULT_CARDS.length % 2 === 1 ? " md:col-span-2 md:mx-auto md:w-full md:max-w-[560px]" : ""}`}
               >
                 <div className="mb-2 font-display text-xl font-semibold">{card.title}</div>
                 <div className="flex flex-wrap gap-5">
