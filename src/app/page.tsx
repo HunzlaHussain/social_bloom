@@ -1,26 +1,76 @@
 'use client';
 
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import Image from "next/image";
 import Link from "next/link";
 
-const RESULT_CARDS = [
+const CASE_STUDIES = [
   {
     title: "Northstar Capital",
+    headline: "Supported $7.4M in funded volume over 83 days",
     value: "$7.4M",
-    subtext: "Funded volume influenced in 83 days",
+    metricLabel: "Funded volume influenced in 83 days",
+    overview:
+      "Northstar Capital wanted a more structured outbound system to create qualified borrower conversations at a consistent pace. We helped build that system from the ground up by refining the outbound offer, defining the ideal borrower profile, setting up cold email infrastructure, launching campaigns, and following up with positive replies to get qualified prospects onto the calendar quickly.",
+    whatWeDidLead: "We worked with Northstar to:",
+    whatWeDid: [
+      "clarify the outbound offer and positioning",
+      "define the ICP and borrower segments to target",
+      "build and configure the cold email infrastructure",
+      "launch and optimize the outbound campaigns",
+      "call positive replies to increase contact speed",
+      "book qualified meetings directly onto the calendar",
+      "support the handoff into the sales process",
+      "increase outbound volume as performance stabilized",
+    ],
+    result:
+      "Over 83 days, this outbound system helped generate qualified borrower conversations that supported $7.4M in funded volume.",
   },
   {
     title: "Summit Business Funding",
+    headline: "19 qualified business borrower appointments in 5 weeks",
     value: "19",
-    subtext: "Qualified business borrower appointments in 5 weeks",
+    metricLabel: "Qualified business borrower appointments in 5 weeks",
+    overview:
+      "Summit Business Funding needed a more reliable way to generate conversations with qualified business borrowers. We built an outbound system designed to do more than just drive replies. The goal was to generate actual appointments with businesses that fit their lending criteria and were worth the team’s time.",
+    whatWeDidLead: "We helped Summit:",
+    whatWeDid: [
+      "tighten the outbound offer",
+      "define the right borrower ICPs",
+      "set up cold email infrastructure",
+      "launch targeted campaigns",
+      "monitor and optimize response quality",
+      "call positive replies to move prospects faster",
+      "book qualified appointments directly onto the client’s calendar",
+      "support the sales process after booking",
+    ],
+    result:
+      "In the first 5 weeks, the campaign generated 19 qualified business borrower appointments.",
   },
   {
     title: "Ironclad Working Capital",
+    headline: "18% improvement in application-to-funding efficiency",
     value: "18%",
-    subtext: "Improvement in application-to-funding efficiency",
+    metricLabel: "Improvement in application-to-funding efficiency",
+    overview:
+      "Ironclad Working Capital was not just looking for more top-of-funnel activity. The bigger opportunity was improving fit, follow-up, and conversion quality throughout the process. We built an outbound system aimed at bringing in stronger borrower opportunities and helping the team move faster on positive intent.",
+    whatWeDidLead: "We partnered with Ironclad to:",
+    whatWeDid: [
+      "refine the offer for outbound",
+      "define tighter borrower targeting criteria",
+      "set up the cold email infrastructure",
+      "launch and optimize campaigns",
+      "identify and respond quickly to positive replies",
+      "call engaged prospects to accelerate next steps",
+      "book qualified conversations onto the calendar",
+      "support a stronger sales handoff and follow-up process",
+      "scale activity once the system was working",
+    ],
+    result:
+      "By improving targeting, response handling, and downstream sales coordination, Ironclad saw an 18% improvement in application-to-funding efficiency.",
   },
 ] as const;
 
@@ -58,6 +108,15 @@ export default function Home() {
   };
 
   const mockNumbers = useMemo(() => makeMockNumbers("social-bloom:home:metrics"), []);
+
+  const [caseSlide, setCaseSlide] = useState(0);
+  const caseTouchStartX = useRef<number | null>(null);
+  const caseStudyCount = CASE_STUDIES.length;
+  const isFirstCaseSlide = caseSlide === 0;
+  const isLastCaseSlide = caseSlide === caseStudyCount - 1;
+  const goCasePrev = () => setCaseSlide((i) => Math.max(0, i - 1));
+  const goCaseNext = () =>
+    setCaseSlide((i) => Math.min(caseStudyCount - 1, i + 1));
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -657,25 +716,136 @@ export default function Home() {
               funded volume.
             </p>
           </div>
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-            {RESULT_CARDS.map((card, i) => (
-              <div
-                key={card.title}
-                className={`rounded-2xl border border-sb-border bg-sb-card p-6 transition-[border-color,transform] duration-300 hover:-translate-y-0.5 hover:border-sb-border-strong sm:p-8 reveal${
-                  i === 1 ? " reveal-delay-1" : i === 2 ? " reveal-delay-2" : ""
-                }${i === RESULT_CARDS.length - 1 && RESULT_CARDS.length % 2 === 1 ? " md:col-span-2 md:mx-auto md:w-full md:max-w-[560px]" : ""}`}
+          <div
+            className="reveal relative mx-auto max-w-[720px]"
+            onKeyDown={(e) => {
+              if (e.key === "ArrowLeft") {
+                e.preventDefault();
+                goCasePrev();
+              } else if (e.key === "ArrowRight") {
+                e.preventDefault();
+                goCaseNext();
+              }
+            }}
+            onTouchStart={(e) => {
+              caseTouchStartX.current = e.targetTouches[0]?.clientX ?? null;
+            }}
+            onTouchEnd={(e) => {
+              const start = caseTouchStartX.current;
+              caseTouchStartX.current = null;
+              if (start == null) return;
+              const end = e.changedTouches[0]?.clientX;
+              if (end == null) return;
+              const delta = end - start;
+              if (Math.abs(delta) < 48) return;
+              if (delta > 0) goCasePrev();
+              else goCaseNext();
+            }}
+            role="region"
+            aria-roledescription="carousel"
+            aria-label="Client results case studies"
+            tabIndex={0}
+          >
+            <div className="mx-auto flex w-full max-w-[880px] items-center gap-2 sm:gap-4 md:gap-6">
+              <button
+                type="button"
+                onClick={goCasePrev}
+                disabled={isFirstCaseSlide}
+                className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-sb-border bg-sb-card text-sb-text shadow-sm transition hover:border-sb-border-strong hover:bg-sb-bg-secondary disabled:cursor-not-allowed disabled:opacity-35 disabled:hover:border-sb-border disabled:hover:bg-sb-card sm:h-11 sm:w-11"
+                aria-label="Previous case study"
               >
-                <div className="mb-2 font-display text-xl font-semibold">{card.title}</div>
-                <div className="flex flex-wrap gap-5">
-                  <div className="min-w-[100px] flex-1 rounded-[10px] border border-sb-border bg-[rgba(42,50,130,0.05)] p-4">
-                    <div className="mb-0.5 font-display text-[1.3rem] font-bold text-sb-accent">
-                      {card.value}
-                    </div>
-                    <div className="text-[0.75rem] font-medium text-sb-text-muted">{card.subtext}</div>
+                <ChevronLeft className="h-5 w-5" aria-hidden />
+              </button>
+              <div className="min-w-0 flex-1">
+                <div className="overflow-hidden rounded-2xl">
+                  <div
+                    className="flex transition-transform duration-500 ease-out motion-reduce:transition-none"
+                    style={{ transform: `translateX(-${caseSlide * 100}%)` }}
+                  >
+                    {CASE_STUDIES.map((study, slideIndex) => (
+                      <article
+                        key={study.title}
+                        className="w-full shrink-0 border-x border-transparent px-0.5"
+                        aria-hidden={caseSlide !== slideIndex}
+                      >
+                        <div className="rounded-2xl border border-sb-border bg-sb-card p-6 sm:p-8">
+                          <div className="mb-1 font-display text-xl font-semibold">{study.title}</div>
+                          <p className="mb-4 text-[0.95rem] font-medium leading-snug text-sb-text-secondary">
+                            {study.headline}
+                          </p>
+                          <div className="mb-8 flex flex-wrap gap-5">
+                            <div className="min-w-[100px] flex-1 rounded-[10px] border border-sb-border bg-[rgba(42,50,130,0.05)] p-4">
+                              <div className="mb-0.5 font-display text-[1.3rem] font-bold text-sb-accent">
+                                {study.value}
+                              </div>
+                              <div className="text-[0.75rem] font-medium text-sb-text-muted">
+                                {study.metricLabel}
+                              </div>
+                            </div>
+                          </div>
+                          <div className="space-y-6 text-[0.92rem] leading-relaxed text-sb-text-secondary [&_h3]:text-sb-text">
+                            <div>
+                              <h3 className="mb-2 text-sm font-bold uppercase tracking-[0.08em] text-sb-text">
+                                Overview
+                              </h3>
+                              <p>{study.overview}</p>
+                            </div>
+                            <div>
+                              <h3 className="mb-2 text-sm font-bold uppercase tracking-[0.08em] text-sb-text">
+                                What We Did
+                              </h3>
+                              <p className="mb-2 font-medium text-sb-text">{study.whatWeDidLead}</p>
+                              <ul className="list-disc space-y-1.5 pl-5 marker:text-sb-text-muted">
+                                {study.whatWeDid.map((item) => (
+                                  <li key={item}>{item}</li>
+                                ))}
+                              </ul>
+                            </div>
+                            <div>
+                              <h3 className="mb-2 text-sm font-bold uppercase tracking-[0.08em] text-sb-text">
+                                Result
+                              </h3>
+                              <p>{study.result}</p>
+                            </div>
+                          </div>
+                        </div>
+                      </article>
+                    ))}
                   </div>
                 </div>
               </div>
-            ))}
+              <button
+                type="button"
+                onClick={goCaseNext}
+                disabled={isLastCaseSlide}
+                className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-sb-border bg-sb-card text-sb-text shadow-sm transition hover:border-sb-border-strong hover:bg-sb-bg-secondary disabled:cursor-not-allowed disabled:opacity-35 disabled:hover:border-sb-border disabled:hover:bg-sb-card sm:h-11 sm:w-11"
+                aria-label="Next case study"
+              >
+                <ChevronRight className="h-5 w-5" aria-hidden />
+              </button>
+            </div>
+
+            <div className="mt-6 flex justify-center">
+              <div className="flex gap-2" role="group" aria-label="Case study slides">
+                {CASE_STUDIES.map((study, i) => (
+                  <button
+                    key={study.title}
+                    type="button"
+                    aria-current={caseSlide === i ? "true" : undefined}
+                    aria-label={`Show ${study.title}`}
+                    onClick={() => setCaseSlide(i)}
+                    className={`h-2.5 rounded-full transition-[width,background-color] duration-300 ${
+                      caseSlide === i
+                        ? "w-8 bg-sb-primary"
+                        : "w-2.5 bg-sb-border-strong hover:bg-sb-text-muted"
+                    }`}
+                  />
+                ))}
+              </div>
+            </div>
+            <p className="mt-3 text-center text-xs text-sb-text-muted">
+              Use arrow keys or swipe to move between stories.
+            </p>
           </div>
         </div>
       </section>
